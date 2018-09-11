@@ -1,0 +1,13 @@
+Goals
+-------
+HARD
+Every role assigned to an actor
+Incompatible roles cannot be assigned to the same actor
+An actor can't have one of their prohibited roles
+
+SOFT
+Every actor should have approximately the same number of lines
+An actor should not be assigned to one of their discouraged roles (?)
+
+LINE NUMBERS:
+https://www.shakespeareswords.com/Public/LanguageCompanion/CharactersParts.aspx
