@@ -55,5 +55,6 @@
 	<classpathentry kind="lib" path="binaries/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="binaries/xstream-1.4.10.jar"/>
 	<classpathentry kind="lib" path="opencsv-4.1.jar"/>
+	<classpathentry kind="lib" path="core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
