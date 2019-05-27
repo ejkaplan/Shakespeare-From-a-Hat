@@ -13,29 +13,38 @@ import org.optaplanner.core.api.solver.SolverFactory;
 
 import com.opencsv.CSVReader;
 
-public class CastingSolutionRunner {
+public class CastingSolutionRunner implements Runnable {
 
-	private static List<Role> roles;
-	private static List<Actor> actors;
+	private List<Role> roles;
+	private List<Actor> actors;
+	private Solver<CastingSolution> solver;
+	private CastingSolution solved;
 
-	public static void main(String[] args) throws IOException {
-		loadData();
+	public static void main(String[] args) {
+		CastingSolutionRunner runner = new CastingSolutionRunner("roles.csv", "actors.csv");
+		Thread thr = new Thread(runner);
+		thr.start();
+		try {
+			thr.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		runner.printSolution();
+	}
+
+	public CastingSolutionRunner(String roleFilename, String actorFilename) {
+		try {
+			loadData(roleFilename, actorFilename);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		Random rand = new Random();
 		for (Role r : roles) {
 			r.setActor(actors.get(rand.nextInt(actors.size())));
 		}
-		SolverFactory<CastingSolution> factory = SolverFactory.createFromXmlResource("solverconfig.xml");
-		Solver<CastingSolution> solver = factory.buildSolver();
-		CastingSolution unsolved = new CastingSolution(actors, roles);
-		CastingSolution solved = solver.solve(unsolved);
-		Map<Actor, List<Role>> cast = solved.getCastMap();
-		Map<Actor, Integer> lines = solved.getLineCounts();
-		for (Actor a : cast.keySet()) {
-			System.out.println(a + ": " + cast.get(a) + " (" + lines.get(a) + ")");
-		}
 	}
 
-	public static void loadData() throws IOException {
+	public void loadData(String roleFilename, String actorFilename) throws IOException {
 		// Read the csv of roles and create the role objects
 		CSVReader reader = new CSVReader(new FileReader("roles.csv"));
 		List<String[]> allRows = reader.readAll();
@@ -72,6 +81,24 @@ public class CastingSolutionRunner {
 					prohibited.add(roleMap.get(roleName));
 			}
 			actors.add(new Actor(name, prohibited));
+		}
+	}
+
+	@Override
+	public void run() {
+		SolverFactory<CastingSolution> factory = SolverFactory.createFromXmlResource("solverconfig.xml");
+		solver = factory.buildSolver();
+		CastingSolution unsolved = new CastingSolution(actors, roles);
+		solved = solver.solve(unsolved);
+	}
+
+	public void printSolution() {
+		if (solved == null)
+			return;
+		Map<Actor, List<Role>> cast = solved.getCastMap();
+		Map<Actor, Integer> lines = solved.getLineCounts();
+		for (Actor a : cast.keySet()) {
+			System.out.println(a + ": " + cast.get(a) + " (" + lines.get(a) + ")");
 		}
 	}
 

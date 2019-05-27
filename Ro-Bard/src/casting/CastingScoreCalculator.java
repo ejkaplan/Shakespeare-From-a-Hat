@@ -60,11 +60,12 @@ public class CastingScoreCalculator implements IncrementalScoreCalculator<Castin
 			actorRoleMap.put(a, new ArrayList<Role>());
 			actorLines.put(a, 0);
 		}
-		idealLinesPerActor = 0;
+		double linesTmp = 0;
 		for (Role r : sln.getRoles()) {
-			idealLinesPerActor += r.getNLines();
+			linesTmp += r.getNLines();
 		}
-		idealLinesPerActor /= sln.getActors().size();
+		linesTmp /= sln.getActors().size();
+		idealLinesPerActor = (int) Math.round(linesTmp);
 		hard = 0;
 		soft = -idealLinesPerActor * sln.getActors().size();
 		for (Role r : sln.getRoles())
