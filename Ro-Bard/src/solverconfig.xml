@@ -6,6 +6,6 @@
     <incrementalScoreCalculatorClass>casting.CastingScoreCalculator</incrementalScoreCalculatorClass>
   </scoreDirectorFactory>
   <termination>
-  	<secondsSpentLimit>30</secondsSpentLimit>
+  	<secondsSpentLimit>10</secondsSpentLimit>
   </termination>
 </solver>

@@ -3,11 +3,13 @@ package casting;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
@@ -58,6 +60,7 @@ public class CastingSolutionRunner implements Runnable {
 			roleMap.put(name, r);
 			roles.add(r);
 		}
+		Collections.shuffle(roles);
 		// Make sure that the program knows which roles are incompatible
 		for (String[] row : allRows) {
 			Role r = roleMap.get(row[0]);
@@ -82,6 +85,7 @@ public class CastingSolutionRunner implements Runnable {
 			}
 			actors.add(new Actor(name, prohibited));
 		}
+		Collections.shuffle(actors);
 	}
 
 	@Override
@@ -90,6 +94,7 @@ public class CastingSolutionRunner implements Runnable {
 		solver = factory.buildSolver();
 		CastingSolution unsolved = new CastingSolution(actors, roles);
 		solved = solver.solve(unsolved);
+		printSolution();
 	}
 
 	public void printSolution() {
@@ -100,6 +105,24 @@ public class CastingSolutionRunner implements Runnable {
 		for (Actor a : cast.keySet()) {
 			System.out.println(a + ": " + cast.get(a) + " (" + lines.get(a) + ")");
 		}
+	}
+
+	public boolean isSolving() {
+		if (solver == null)
+			return false;
+		return solver.isSolving();
+	}
+
+	public HardSoftScore getBestScore() {
+		return (HardSoftScore) solver.getBestScore();
+	}
+
+	public boolean isDone() {
+		return solver != null && !isSolving();
+	}
+
+	public CastingSolution getBestSolution() {
+		return solver.getBestSolution();
 	}
 
 }
