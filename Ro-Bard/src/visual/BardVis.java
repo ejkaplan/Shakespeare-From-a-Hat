@@ -25,14 +25,13 @@ public class BardVis extends PApplet {
 	private float angle;
 	private PGraphics modelLayer;
 	private PGraphics waveLayer;
-	private SoundFile music;
-	private Waveform wave;
+	private SoundFile music, speech;
+	private Waveform musicWave;
+	private Waveform speechWave;
 	private int samples;
 	private float h = 0;
 	private PShape waveform;
 	private Amplitude amp;
-	private float smoothingFactor = 0.5f;
-	private float ampSum = 0;
 	private float waveMult = 10;
 
 	private CastingSolutionRunner runner;
@@ -40,7 +39,7 @@ public class BardVis extends PApplet {
 
 	private int castIndex = -1;
 	private int changeTime = 0;
-	private int changeInterval = 5000;
+	private int changeInterval = 7000;
 
 	private PFont myFont;
 	private int shadowDist = 8;
@@ -65,10 +64,16 @@ public class BardVis extends PApplet {
 		model.rotateY(PI);
 		smooth();
 		music = new SoundFile(this, "suite_jam.wav");
+		speech = new SoundFile(this, "shakes.wav");
 		music.amp(0.1f);
-		music.loop();
-		wave = new Waveform(this, samples);
-		wave.input(music);
+//		music.loop();
+		speech.play();
+		musicWave = new Waveform(this, samples);
+		musicWave.input(music);
+		amp = new Amplitude(this);
+		amp.input(music);
+		speechWave = new Waveform(this, samples);
+		speechWave.input(speech);
 		amp = new Amplitude(this);
 		amp.input(music);
 		myFont = createFont("forced square", 200);
@@ -86,29 +91,10 @@ public class BardVis extends PApplet {
 		h += 0.5;
 		if (h > 255)
 			h -= 255;
-		if (runner.isDone()) {
-			CastingSolution sln = runner.getBestSolution();
-			if (millis() > changeTime) {
-				castIndex = (castIndex + 1) % sln.getActors().size();
-				changeTime = millis() + changeInterval;
-			}
-			Actor curr = sln.getActors().get(castIndex);
-			List<Role> roles = sln.getCastMap().get(curr);
-			textFont(myFont);
-			fill(0, 200);
-			text(curr.getName(), shadowDist, height / 8 + shadowDist, width, height / 4);
-			fill(255);
-			text(curr.getName(), 0, height / 8, width, height / 4);
-			textSize(100);
-			fill(0, 200);
-			text("as", width / 2 + shadowDist, 3 * height / 8 + shadowDist);
-			fill(255);
-			text("as", width / 2, 3 * height / 8);
-			textSize(150);
-			fill(0, 200);
-			text(combineRoles(roles), width / 20 + shadowDist, height / 2 + shadowDist, 18 * width / 20, height / 2);
-			fill(255);
-			text(combineRoles(roles), width / 20, height / 2, 18 * width / 20, height / 2);
+		if (runner.isDone() && !speech.isPlaying()) {
+			if (!music.isPlaying())
+				music.loop();
+			drawText();
 		}
 	}
 
@@ -135,12 +121,15 @@ public class BardVis extends PApplet {
 		waveLayer.noFill();
 		waveLayer.stroke(h, 255, 255);
 		waveLayer.strokeWeight(5);
-		waveLayer.shape(makeWaveform());
+		if (speech.isPlaying())
+			waveLayer.shape(makeWaveform(speechWave));
+		else
+			waveLayer.shape(makeWaveform(musicWave));
 		waveLayer.endDraw();
 		image(waveLayer, 0, 0);
 	}
 
-	private PShape makeWaveform() {
+	private PShape makeWaveform(Waveform wave) {
 		wave.analyze();
 		if (waveform == null) {
 			waveform = createShape();
@@ -163,11 +152,6 @@ public class BardVis extends PApplet {
 		return waveform;
 	}
 
-	private float getSmoothedAmp() {
-		ampSum += (amp.analyze() - ampSum) * smoothingFactor;
-		return ampSum;
-	}
-
 	private String combineRoles(List<Role> roles) {
 		String out = "";
 		for (int i = 0; i < roles.size(); i++) {
@@ -178,5 +162,29 @@ public class BardVis extends PApplet {
 				out += "and ";
 		}
 		return out;
+	}
+
+	private void drawText() {
+		CastingSolution sln = runner.getBestSolution();
+		if (millis() > changeTime) {
+			castIndex = (castIndex + 1) % sln.getActors().size();
+			changeTime = millis() + changeInterval;
+		}
+		Actor curr = sln.getActors().get(castIndex);
+		List<Role> roles = sln.getCastMap().get(curr);
+		fill(0, 200); // Drop shadow
+		textFont(myFont);
+		text(curr.getName(), shadowDist, height / 8 + shadowDist, width, height / 4);
+		textSize(100);
+		text("as", width / 2 + shadowDist, 3 * height / 8 + shadowDist);
+		textSize(150);
+		text(combineRoles(roles), width / 15 + shadowDist, height / 2 + shadowDist, 13 * width / 15, height / 2);
+		fill(255); // Actual text
+		textFont(myFont);
+		text(curr.getName(), 0, height / 8, width, height / 4);
+		textSize(100);
+		text("as", width / 2, 3 * height / 8);
+		textSize(150);
+		text(combineRoles(roles), width / 15, height / 2, 13 * width / 15, height / 2);
 	}
 }

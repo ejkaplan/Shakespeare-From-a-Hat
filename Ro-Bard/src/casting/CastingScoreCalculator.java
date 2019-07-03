@@ -28,8 +28,8 @@ public class CastingScoreCalculator implements IncrementalScoreCalculator<Castin
 		}
 		actorRoleMap.get(actor).add(r);
 		int lines = actorLines.get(actor) + r.getNLines();
-		int oldDiff = Math.abs(actorLines.get(actor) - idealLinesPerActor);
-		int newDiff = Math.abs(lines - idealLinesPerActor);
+		int oldDiff = (int) Math.pow(Math.abs(actorLines.get(actor) - idealLinesPerActor), 2);
+		int newDiff = (int) Math.pow(Math.abs(lines - idealLinesPerActor), 2);
 		soft += oldDiff - newDiff;
 		actorLines.put(actor, lines);
 	}
@@ -46,8 +46,8 @@ public class CastingScoreCalculator implements IncrementalScoreCalculator<Castin
 			}
 		}
 		int lines = actorLines.get(actor) - r.getNLines();
-		int oldDiff = Math.abs(actorLines.get(actor) - idealLinesPerActor);
-		int newDiff = Math.abs(lines - idealLinesPerActor);
+		int oldDiff = (int) Math.pow(Math.abs(actorLines.get(actor) - idealLinesPerActor), 2);
+		int newDiff = (int) Math.pow(Math.abs(lines - idealLinesPerActor), 2);
 		soft += oldDiff - newDiff;
 		actorLines.put(actor, lines);
 	}
@@ -67,7 +67,7 @@ public class CastingScoreCalculator implements IncrementalScoreCalculator<Castin
 		linesTmp /= sln.getActors().size();
 		idealLinesPerActor = (int) Math.round(linesTmp);
 		hard = 0;
-		soft = -idealLinesPerActor * sln.getActors().size();
+		soft = (int) (-Math.pow(idealLinesPerActor, 2) * sln.getActors().size());
 		for (Role r : sln.getRoles())
 			insert(r);
 	}

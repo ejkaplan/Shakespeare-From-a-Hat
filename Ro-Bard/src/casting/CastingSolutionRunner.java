@@ -31,7 +31,6 @@ public class CastingSolutionRunner implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		runner.printSolution();
 	}
 
 	public CastingSolutionRunner(String roleFilename, String actorFilename) {

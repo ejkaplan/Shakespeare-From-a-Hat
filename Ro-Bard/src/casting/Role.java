@@ -6,7 +6,7 @@ import java.util.Set;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
-@PlanningEntity
+@PlanningEntity(difficultyComparatorClass = RoleDifficultyComparator.class)
 public class Role {
 
 	private String name;
