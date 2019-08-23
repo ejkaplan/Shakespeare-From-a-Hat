@@ -7,7 +7,7 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 @PlanningEntity(difficultyComparatorClass = RoleDifficultyComparator.class)
-public class Role {
+public class Role implements Comparable<Role> {
 
 	private String name;
 	private Set<Role> incompatible;
@@ -81,6 +81,11 @@ public class Role {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Role other) {
+		return getNLines() - other.getNLines();
 	}
 
 }

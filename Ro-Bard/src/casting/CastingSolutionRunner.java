@@ -124,4 +124,10 @@ public class CastingSolutionRunner implements Runnable {
 		return solver.getBestSolution();
 	}
 
+	public boolean terminateEarly() {
+		if (isSolving())
+			return solver.terminateEarly();
+		return false;
+	}
+
 }

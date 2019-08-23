@@ -39,14 +39,17 @@ public class BardVis extends PApplet {
 
 	private int castIndex = -1;
 	private int changeTime = 0;
-	private int changeInterval = 7000;
+	private int changeInterval = 5500;
 
 	private PFont myFont;
 	private int shadowDist = 8;
 
+	private int eventTime;
+	private int mode = 0;
+
 	public void settings() {
-//		size(640, 480, P3D);
 		fullScreen(P3D);
+//		size(640, 480, P3D);
 	}
 
 	public void setup() {
@@ -65,9 +68,8 @@ public class BardVis extends PApplet {
 		smooth();
 		music = new SoundFile(this, "suite_jam.wav");
 		speech = new SoundFile(this, "shakes.wav");
+//		speech = new SoundFile(this, "test.wav");
 		music.amp(0.1f);
-//		music.loop();
-		speech.play();
 		musicWave = new Waveform(this, samples);
 		musicWave.input(music);
 		amp = new Amplitude(this);
@@ -81,6 +83,7 @@ public class BardVis extends PApplet {
 		runner = new CastingSolutionRunner("roles.csv", "actors.csv");
 		thr = new Thread(runner);
 		thr.start();
+		eventTime = millis() + 1000;
 	}
 
 	public void draw() {
@@ -91,9 +94,15 @@ public class BardVis extends PApplet {
 		h += 0.5;
 		if (h > 255)
 			h -= 255;
-		if (runner.isDone() && !speech.isPlaying()) {
-			if (!music.isPlaying())
-				music.loop();
+		if (mode == 0 && millis() > eventTime) {
+			speech.play();
+			mode = 1;
+			eventTime = millis() + 1000;
+		} else if (millis() > eventTime && mode == 1 && !speech.isPlaying()) {
+			music.loop();
+			eventTime = millis() + 2200;
+			mode = 2;
+		} else if (mode == 2 && millis() > eventTime) {
 			drawText();
 		}
 	}
@@ -174,17 +183,19 @@ public class BardVis extends PApplet {
 		List<Role> roles = sln.getCastMap().get(curr);
 		fill(0, 200); // Drop shadow
 		textFont(myFont);
+		textSize(height * 200f / 1080f);
 		text(curr.getName(), shadowDist, height / 8 + shadowDist, width, height / 4);
-		textSize(100);
+		textSize(height * 100f / 1080f);
 		text("as", width / 2 + shadowDist, 3 * height / 8 + shadowDist);
-		textSize(150);
+		textSize(height * 150f / 1080f);
 		text(combineRoles(roles), width / 15 + shadowDist, height / 2 + shadowDist, 13 * width / 15, height / 2);
 		fill(255); // Actual text
 		textFont(myFont);
+		textSize(height * 200f / 1080f);
 		text(curr.getName(), 0, height / 8, width, height / 4);
-		textSize(100);
+		textSize(height * 100f / 1080f);
 		text("as", width / 2, 3 * height / 8);
-		textSize(150);
+		textSize(height * 150f / 1080f);
 		text(combineRoles(roles), width / 15, height / 2, 13 * width / 15, height / 2);
 	}
 }

@@ -2,6 +2,7 @@ package casting;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,10 @@ public class CastingSolution {
 				cast.put(a, new ArrayList<Role>());
 			}
 			cast.get(a).add(r);
+		}
+		for (Actor a : cast.keySet()) {
+			Collections.sort(cast.get(a));
+			Collections.reverse(cast.get(a));
 		}
 		return cast;
 	}
